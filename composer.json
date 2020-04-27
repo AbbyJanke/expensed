@@ -1,5 +1,5 @@
 {
-  "name": "abbyjanke/Expensed",
+  "name": "abbyjanke/expensed",
   "description": "Expense Tracker for Laravel",
   "minimum-stability": "dev",
   "license": "MIT",
@@ -13,5 +13,15 @@
       "php": "^7.2.5",
       "laravel/framework": "^7.0",
       "backpack/crud": "^4.1"
-  }
+  },
+  "extra": {
+      "branch-alias": {
+          "dev-master": "dev"
+      },
+      "laravel": {
+          "providers": [
+              "AbbyJanke\\Expensed\\ExpensedServiceProvider"
+          ]
+        }
+    }
 }
