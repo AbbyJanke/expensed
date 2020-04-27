@@ -1,0 +1,17 @@
+{
+  "name": "abbyjanke/Expensed",
+  "description": "Expense Tracker for Laravel",
+  "minimum-stability": "dev",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Abby Janke",
+      "email": "me@abbyjanke.com"
+    }
+  ],
+  "require": {
+      "php": "^7.2.5",
+      "laravel/framework": "^7.0",
+      "backpack/crud": "^4.1"
+  }
+}
