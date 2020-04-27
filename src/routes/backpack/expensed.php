@@ -11,9 +11,9 @@
 */
 
 Route::group([
-    'namespace'  => 'AbbyJanke\Expensed\app\Http\Controllers',
+    'namespace'  => 'AbbyJanke\Expensed\app\Http\Controllers\Admin',
     'middleware' => ['web', config('backpack.base.middleware_key', 'admin')],
     'prefix'     => config('backpack.base.route_prefix', 'admin'),
 ], function () {
-    //
+    Route::crud('currency', 'CurrencyCrudController');
 });

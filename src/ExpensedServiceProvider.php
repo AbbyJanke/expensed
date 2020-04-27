@@ -25,6 +25,8 @@ class ExpensedServiceProvider extends ServiceProvider
         $this->loadCommands();
 
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'expensed');
+        $this->loadTranslationsFrom(__DIR__.'/resources/lang', 'expensed');
 
         // use the vendor configuration file as fallback
         $this->mergeConfigFrom(

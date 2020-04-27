@@ -3,9 +3,12 @@
 namespace AbbyJanke\Expensed\App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Backpack\CRUD\app\Models\Traits\CrudTrait;
 
 class Currency extends Model
 {
+    use CrudTrait;
+
     /*
     |--------------------------------------------------------------------------
     | GLOBAL VARIABLES
