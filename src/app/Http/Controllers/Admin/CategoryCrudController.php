@@ -72,9 +72,6 @@ class CategoryCrudController extends CrudController
                 'expense'       => trans('expensed::base.expense'),
             ]
         ]);
-
-        // TODO: remove setFromDb() and manually define Fields
-        //$this->crud->setFromDb();
     }
 
     protected function setupUpdateOperation()
