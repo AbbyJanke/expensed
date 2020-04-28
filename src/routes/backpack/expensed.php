@@ -16,4 +16,5 @@ Route::group([
     'prefix'     => config('backpack.base.route_prefix', 'admin'),
 ], function () {
     Route::crud('currency', 'CurrencyCrudController');
+    Route::crud('expenses/category', 'CategoryCrudController');
 });

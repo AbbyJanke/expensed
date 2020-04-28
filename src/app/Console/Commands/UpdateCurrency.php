@@ -40,14 +40,13 @@ class UpdateCurrency extends Command
     public function handle()
     {
         $currencyRates = Http::get(getCurrencyURL('latest', '&show_alternative=true'))['rates'];
-
         foreach($currencyRates as $code => $currencyRate) {
             if(!$currency = Currency::where('code', $code)->first()) {
                 $currency = $this->currencyNotFound($code);
             }
 
             $currency->exchange_rate = $currencyRate;
-            $currency->save;
+            $currency->save();
         }
 
         return;
