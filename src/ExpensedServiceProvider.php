@@ -23,9 +23,10 @@ class ExpensedServiceProvider extends ServiceProvider
     {
         $this->setupRoutes();
         $this->loadCommands();
+        $this->loadViews();
 
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-        $this->loadViewsFrom(__DIR__.'/resources/views', 'expensed');
+
         $this->loadTranslationsFrom(__DIR__.'/resources/lang', 'expensed');
 
         // use the vendor configuration file as fallback
@@ -34,11 +35,13 @@ class ExpensedServiceProvider extends ServiceProvider
             'backpack.expensed'
         );
 
-        // publish config file
-        $this->publishes([__DIR__.'/config' => config_path()], 'config');
+        $this->publishAssets();
     }
 
-    public function setupRoutes()
+    /**
+     * Assign Routes For Expense
+     */
+    private function setupRoutes()
     {
         $routeFilePathInUse = __DIR__.$this->routeFilePath;
         if (file_exists(base_path().$this->routeFilePath)) {
@@ -48,6 +51,9 @@ class ExpensedServiceProvider extends ServiceProvider
         $this->loadRoutesFrom($routeFilePathInUse);
     }
 
+    /**
+     * Load Necessary Commands
+     */
     private function loadCommands()
     {
         if ($this->app->runningInConsole()) {
@@ -57,6 +63,34 @@ class ExpensedServiceProvider extends ServiceProvider
                 \AbbyJanke\Expensed\App\Console\Commands\UpdateCurrency::class
             ]);
         }
+    }
+
+    /**
+     * Load Views
+     */
+    private function loadViews()
+    {
+        $customFolder = resource_path('views/vendor/expensed');
+
+        // - first the published/overwritten views (in case they have any changes)
+        if (file_exists($customFolder)) {
+            $this->loadViewsFrom($customFolder, 'expensed');
+        }
+
+        // - then the stock views that come with the package, in case a published view might be missing
+        $this->loadViewsFrom(realpath(__DIR__.'/resources/views'), 'expensed');
+    }
+
+    /**
+     * Publish Assets
+     */
+    private function publishAssets()
+    {
+        $this->publishes([
+            __DIR__.'/resources/lang' => resource_path('lang/vendor/expensed'),
+            __DIR__.'/resources/views' => resource_path('views/vendor/expensed'),
+            __DIR__.__DIR__.'/config/backpack/expensed.php' => config_path('backpack/expensed.php'),
+        ]);
     }
 
     /**

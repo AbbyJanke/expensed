@@ -4,8 +4,6 @@ namespace AbbyJanke\Expensed\App\Http\Controllers\Admin;
 
 use App\Http\Requests\CurrencyRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
-use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Prologue\Alerts\Facades\Alert;
 
@@ -17,7 +15,6 @@ use Prologue\Alerts\Facades\Alert;
 class CurrencyCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
@@ -26,10 +23,10 @@ class CurrencyCrudController extends CrudController
     {
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Currency');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/currency');
-        $this->crud->setEntityNameStrings('currency', 'currencies');
+        $this->crud->setEntityNameStrings(trans('expensed::base.currency'), trans('expensed::base.currencies'));
 
         $this->crud->denyAccess('create');
-        $this->crud->addButton('top', 'update_rates', 'view', 'expensed::update_exchange_button', 'beginning');
+        $this->crud->addButton('top', 'update_rates', 'view', 'expensed::buttons.update_rates', 'beginning');
 
         if (!$this->crud->getRequest()->has('order')) {
             $this->crud->orderBy('id');
@@ -38,28 +35,53 @@ class CurrencyCrudController extends CrudController
 
     protected function setupListOperation()
     {
-        // TODO: remove setFromDb() and manually define Columns, maybe Filters
-        $this->crud->addColumn('code');
-        $this->crud->addColumn('name');
+        $this->setupFilters();
+
+        $this->crud->addColumn([
+            'name'      => 'code',
+            'label'     => trans('expensed::base.code'),
+        ]);
+        $this->crud->addColumn([
+            'name'      => 'name',
+            'label'     => trans('backpack::base.name'),
+        ]);
         $this->crud->addColumn([
             'name'      => 'exchange_rate',
-            'label'     => 'Rate'
+            'label'     => trans('expensed::base.exchange_rate'),
+        ]);
+        $this->crud->addColumn([
+            'name'       => 'active',
+            'label'     => trans('expensed::base.active_currency'),
+            'type'       => 'check'
         ]);
         $this->crud->addColumn([
            'name'       => 'updated_at',
-           'label'      => 'Last Update',
+            'label'     => trans('expensed::base.last_update'),
            'type'       => 'datetime'
         ]);
     }
 
-    protected function setupCreateOperation()
+    /**
+     * Allow rates to be updated via web interface.
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function updateRates()
     {
-        $this->crud->setValidation(CurrencyRequest::class);
+        $cmd = 'php '.base_path().'/artisan currency:update';
+        $export = shell_exec($cmd);
 
-        // TODO: remove setFromDb() and manually define Fields
-        $this->crud->setFromDb();
+        Alert::info(trans('expensed::expensed.rates_processing'))->flash();
+
+        return redirect(backpack_url('currency'));
     }
 
+    /**
+     * Add `rates` to the CRUD routes.
+     * @param $segment
+     * @param $routeName
+     * @param $controller
+     */
     protected function setupPublishRoutes($segment, $routeName, $controller)
     {
         Route::get($segment.'/rates', [
@@ -69,14 +91,18 @@ class CurrencyCrudController extends CrudController
         ]);
     }
 
-    public function updateRates()
+    protected function setupFilters()
     {
-        $cmd = 'php '.base_path().'/artisan currency:update';
-        $export = shell_exec($cmd);
-
-        Alert::info(trans('expensed::expensed.rates_processing'))->flash();
-
-        return redirect(backpack_url('currency'));
+        $this->crud->addFilter([
+            'name' => 'status',
+            'type' => 'dropdown',
+            'label'=> 'Status'
+        ], [
+            1 => 'Is Active',
+            0 => 'Not Active',
+        ], function($value) { // if the filter is active
+            $this->crud->addClause('where', 'active', $value);
+        });
     }
 
 }
