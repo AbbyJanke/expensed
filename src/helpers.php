@@ -12,3 +12,13 @@ if (! function_exists('getLatestCurrencyURL')) {
     }
 
 }
+
+if (! function_exists('currencySymbol')) {
+
+    function currencySymbol($code)
+    {
+        $currencies = include(__DIR__.'/resources/currencies.php');
+        return $currencies[$code]['symbol'];
+    }
+
+}

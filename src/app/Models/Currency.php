@@ -38,6 +38,25 @@ class Currency extends Model
 
     /*
     |--------------------------------------------------------------------------
+    | ACCESSORS
+    |--------------------------------------------------------------------------
+    */
+    /**
+     * Get the user's first name.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function getSymbolAttribute($value)
+    {
+        $code = $this->attributes['code'];
+        $symbol = currencySymbol($code);
+        return $code.' '.$symbol;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
     | RELATIONS
     |--------------------------------------------------------------------------
     */

@@ -1,6 +1,16 @@
 {
   "name": "abbyjanke/expensed",
   "description": "Expense Tracker for Laravel",
+   "keywords": [
+       "backpack",
+       "income",
+       "expense",
+       "currency",
+       "money",
+       "finance",
+       "CMS",
+       "content management system"
+  ],
   "minimum-stability": "dev",
   "license": "MIT",
   "authors": [
@@ -12,7 +22,8 @@
   "require": {
       "php": "^7.2.5",
       "laravel/framework": "^7.0",
-      "backpack/crud": "^4.1"
+      "backpack/crud": "^4.1",
+      "cknow/laravel-money": "^4.0"
   },
   "extra": {
       "branch-alias": {

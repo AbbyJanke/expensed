@@ -2,6 +2,7 @@
 
 namespace AbbyJanke\Expensed\App\Models;
 
+use App\User;
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
 use Illuminate\Database\Eloquent\Model;
 
@@ -34,7 +35,7 @@ class Income extends Model
      *
      * @var array
      */
-    protected $fillable = ['entry_date', 'amount', 'comments', 'currency_id', 'added_by_id'];
+    protected $fillable = ['entry_date', 'amount', 'comments', 'currency_id', 'category_id', 'added_by_id'];
 
     /**
      * The attributes that should be mutated to dates.
@@ -48,6 +49,10 @@ class Income extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
+    public function getCategories()
+    {
+        return $this->category()->where('type', 'income')->orWhere('type', 'other');
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -73,6 +78,16 @@ class Income extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * What currency was the income received in.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function added_by()
+    {
+        return $this->belongsTo(config('backpack.base.user_model_fqn'));
     }
 
     /*
