@@ -27,6 +27,18 @@ class CategoryCrudController extends CrudController
 
     protected function setupListOperation()
     {
+        $this->crud->addFilter([
+            'name'          => 'type_filter',
+            'label'         => trans('expensed::base.type_filter'),
+            'type'          => 'dropdown',
+        ], [
+            'other' => 'Other',
+            'income' => 'Incomes',
+            'expense' => 'Expenses',
+        ], function($value) {
+           $this->crud->addClause('where', 'type', $value);
+        });
+
         $this->crud->addColumn([
            'name'           => 'name',
            'label'          => trans('backpack::base.name')

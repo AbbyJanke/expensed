@@ -102,7 +102,7 @@ class IncomeCrudController extends CrudController
         $defaultCurrency = Currency::where('code', config('backpack.expensed.default_currency'))->first();
 
         $this->crud->addField([  // Select
-            'label' => "Currency",
+            'label' => trans('expensed::base.currency'),
             'type' => 'select',
             'name' => 'currency_id',
             'entity' => 'currency',
@@ -132,7 +132,7 @@ class IncomeCrudController extends CrudController
         $this->crud->addFilter([
            'type'   => 'date_range',
            'name'   => 'from_to',
-           'label'  => 'Date Range',
+           'label'  => trans('expensed::base.date_range'),
         ], false,
         function ($range) {
             $dates = json_decode($range);

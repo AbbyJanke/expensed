@@ -30,4 +30,8 @@ return [
     'amount'            => 'Amount',
     'exchanged_amount'  => 'Exchanged Amount',
 
+    /* Filters */
+    'type_filter'        => 'Type',
+    'date_range'        => 'Date Range',
+
 ];
