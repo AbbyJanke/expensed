@@ -26,7 +26,10 @@ class IncomeRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'entry_date'    => 'date',
+            'amount'        => 'required',
+            'category_id'      => 'required|exists:categories,id',
+            'currency_id'      => 'required|exists:currencies,id',
         ];
     }
 

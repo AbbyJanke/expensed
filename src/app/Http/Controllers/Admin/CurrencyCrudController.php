@@ -71,7 +71,7 @@ class CurrencyCrudController extends CrudController
         $cmd = 'php '.base_path().'/artisan currency:update';
         $export = shell_exec($cmd);
 
-        Alert::info(trans('expensed::expensed.rates_processing'))->flash();
+        Alert::info(trans('expensed::base.rates_processing'))->flash();
 
         return redirect(backpack_url('currency'));
     }
@@ -82,7 +82,7 @@ class CurrencyCrudController extends CrudController
      * @param $routeName
      * @param $controller
      */
-    protected function setupPublishRoutes($segment, $routeName, $controller)
+    protected function setupRefreshRoutes($segment, $routeName, $controller)
     {
         Route::get($segment.'/rates', [
             'as'        => $routeName.'.rates',

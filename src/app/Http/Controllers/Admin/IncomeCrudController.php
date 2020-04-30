@@ -14,7 +14,7 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 class IncomeCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as storeTrait; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
@@ -23,7 +23,7 @@ class IncomeCrudController extends CrudController
     {
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/expenses/income');
-        $this->crud->setEntityNameStrings('income', 'incomes');
+        $this->crud->setEntityNameStrings(trans('expensed::base.income'), trans('expensed::base.incomes'));
     }
 
     protected function setupListOperation()
@@ -33,11 +33,11 @@ class IncomeCrudController extends CrudController
         $this->crud->addColumn([
             'type'  => 'view',
             'name'  => 'amount',
-            'label' => 'Amount',
+            'label' => trans('expensed::base.amount'),
             'view' => 'expensed::columns.money'
         ]);
         $this->crud->addColumn([
-            'label' => 'Currency',
+            'label' => trans('expensed::base.currency'),
             'type' => 'view',
             'name' => 'currency',
             'entity' => 'currency',
@@ -47,7 +47,7 @@ class IncomeCrudController extends CrudController
             'view' => 'expensed::columns.currency_symbol'
         ]);
         $this->crud->addColumn([
-            'label' => 'Exchanged',
+            'label' => trans('expensed::base.exchanged_amount'),
             'type' => 'view',
             'name' => 'exchanged',
             'entity' => 'currency',
@@ -58,41 +58,39 @@ class IncomeCrudController extends CrudController
         $this->crud->addColumn([
             'type'  => 'text',
             'name'  => 'comments',
-            'label' => 'Comments',
+            'label' => trans('expensed::base.comments'),
         ]);
         $this->crud->addColumn([
             'type'  => 'date',
             'name'  => 'entry_date',
-            'label' => 'Date Received',
+            'label' => trans('expensed::base.date_received'),
         ]);
         $this->crud->addColumn([
-            'label' => "Added By",
-            'type' => "select",
+            'label' => trans('expensed::base.added_by'),
+            'type' => 'select',
             'name' => 'added_by_id',
             'entity' => 'added_by',
-            'attribute' => "name",
+            'attribute' => 'name',
             'model' => config('backpack.base.user_model_fqn'),
         ]);
     }
 
     protected function setupCreateOperation()
     {
+        $this->crud->addField([
+            'name'   => 'amount',
+            'label'  => trans('expensed::base.amount'),
+            'type'   => 'currency',
+            'view_namespace'    => 'expensed::fields'
+        ]);
         $this->crud->setValidation(IncomeRequest::class);
-
         $this->crud->addField([
             'type'  => 'date',
             'name'  => 'entry_date',
-            'label' => 'Date Received',
+            'label' => trans('expensed::base.date_received'),
         ]);
-
-        $this->crud->addField([
-            'name'   => 'amount',
-            'label'  => 'Amount',
-            'type'   => 'number'
-        ]);
-
         $this->crud->addField([  // Select
-            'label' => "Category",
+            'label' => trans('expensed::base.category'),
             'type' => 'select',
             'name' => 'category_id',
             'entity' => 'category',
@@ -113,16 +111,20 @@ class IncomeCrudController extends CrudController
             }),
             'default'   => $defaultCurrency->id,
         ]);
-
-
-
-        // TODO: remove setFromDb() and manually define Fields
-        //$this->crud->setFromDb();
     }
 
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function store()
+    {
+        if(is_null($this->crud->getRequest()->get('entry_date'))) {
+            $this->crud->getRequest()->request->add(['entry_date' => now()]);
+        }
+        $response = $this->storeTrait();
+        return $response;
     }
 
     private function setupFilters()

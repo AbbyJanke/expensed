@@ -18,8 +18,16 @@ return [
     'total_entries'     => 'Total Entries',
     'date_created'      => 'Date Created',
 
-    'other'             => 'Other',
     'income'            => 'Income',
+    'incomes'           => 'Income', // English is weird and income is correct but allowing for customizations.
+    'comments'          => 'Comments',
+    'date_received'     => 'Date Received',
+    'added_by'          => 'Added By',
+
+    'other'             => 'Other',
     'expense'           => 'Expense',
+
+    'amount'            => 'Amount',
+    'exchanged_amount'  => 'Exchanged Amount',
 
 ];

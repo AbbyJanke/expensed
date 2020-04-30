@@ -49,6 +49,18 @@ class Income extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::saving(function ($entry) {
+            $entry->added_by_id = backpack_user()->id;
+        });
+    }
+
     public function getCategories()
     {
         return $this->category()->where('type', 'income')->orWhere('type', 'other');
@@ -92,19 +104,11 @@ class Income extends Model
 
     /*
     |--------------------------------------------------------------------------
-    | SCOPES
-    |--------------------------------------------------------------------------
-    */
-
-    /*
-    |--------------------------------------------------------------------------
-    | ACCESSORS
-    |--------------------------------------------------------------------------
-    */
-
-    /*
-    |--------------------------------------------------------------------------
     | MUTATORS
     |--------------------------------------------------------------------------
     */
+    public function setAmountAttribute($value)
+    {
+        $this->attributes['amount'] = str_replace(',', '', substr($value, 2));
+    }
 }

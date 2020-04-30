@@ -12,6 +12,6 @@
 
 <span>
     @includeWhen(!empty($column['wrapper']), 'crud::columns.inc.wrapper_start')
-    {{ currencySymbol($entry->currency->code) }} {{ $column['text'] }}
+    {{ currencySymbol($entry->currency->code) }} {{ number_format($column['text'], 2) }}
     @includeWhen(!empty($column['wrapper']), 'crud::columns.inc.wrapper_end')
 </span>
