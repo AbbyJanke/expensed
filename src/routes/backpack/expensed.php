@@ -18,4 +18,5 @@ Route::group([
     Route::crud('currency', 'CurrencyCrudController');
     Route::crud('expenses/category', 'CategoryCrudController');
     Route::crud('expenses/income', 'IncomeCrudController');
+    Route::crud('expenses', 'ExpenseCrudController');
 });

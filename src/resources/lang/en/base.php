@@ -26,6 +26,7 @@ return [
 
     'other'             => 'Other',
     'expense'           => 'Expense',
+    'date_paid'         => 'Date Paid',
 
     'amount'            => 'Amount',
     'exchanged_amount'  => 'Exchanged Amount',

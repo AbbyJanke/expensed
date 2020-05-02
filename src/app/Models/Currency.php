@@ -36,6 +36,13 @@ class Currency extends Model
      */
     protected $fillable = ['name', 'code', 'exchange_rate', 'active'];
 
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = ['created_at', 'updated_at'];
+
     /*
     |--------------------------------------------------------------------------
     | ACCESSORS

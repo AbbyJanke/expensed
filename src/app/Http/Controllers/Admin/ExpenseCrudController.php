@@ -2,17 +2,17 @@
 
 namespace AbbyJanke\Expensed\App\Http\Controllers\Admin;
 
-use AbbyJanke\Expensed\App\Http\Requests\IncomeRequest;
+use AbbyJanke\Expensed\App\Http\Requests\ExpenseRequest;
+use Backpack\CRUD\app\Http\Controllers\CrudController;
 use AbbyJanke\Expensed\App\Models\Category;
 use AbbyJanke\Expensed\App\Models\Currency;
-use Backpack\CRUD\app\Http\Controllers\CrudController;
 
 /**
- * Class IncomeCrudController
+ * Class ExpenseCrudController
  * @package App\Http\Controllers\Admin
  * @property-read \Backpack\CRUD\app\Library\CrudPanel\CrudPanel $crud
  */
-class IncomeCrudController extends CrudController
+class ExpenseCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as storeTrait; }
@@ -22,9 +22,9 @@ class IncomeCrudController extends CrudController
 
     public function setup()
     {
-        $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
-        $this->crud->setRoute(config('backpack.base.route_prefix') . '/expenses/income');
-        $this->crud->setEntityNameStrings(trans('expensed::base.income'), trans('expensed::base.incomes'));
+        $this->crud->setModel('AbbyJanke\Expensed\App\Models\Expense');
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/expenses');
+        $this->crud->setEntityNameStrings('expense', 'expenses');
     }
 
     protected function setupListOperation()
@@ -59,7 +59,7 @@ class IncomeCrudController extends CrudController
         $this->crud->addColumn([
             'type'  => 'date',
             'name'  => 'entry_date',
-            'label' => trans('expensed::base.date_received'),
+            'label' => trans('expensed::base.date_paid'),
         ]);
         $this->crud->addColumn([
             'label' => trans('expensed::base.added_by'),
@@ -79,11 +79,11 @@ class IncomeCrudController extends CrudController
             'type'   => 'currency',
             'view_namespace'    => 'expensed::fields'
         ]);
-        $this->crud->setValidation(IncomeRequest::class);
+        $this->crud->setValidation(ExpenseRequest::class);
         $this->crud->addField([
             'type'  => 'date',
             'name'  => 'entry_date',
-            'label' => trans('expensed::base.date_received'),
+            'label' => trans('expensed::base.date_paid'),
         ]);
         $this->crud->addField([  // Select
             'label' => trans('expensed::base.category'),
@@ -91,7 +91,7 @@ class IncomeCrudController extends CrudController
             'name' => 'category_id',
             'entity' => 'category',
             'options'   => (function ($query) {
-                return $query->where('type', 'income')->orWhere('type', 'other')->get();
+                return $query->where('type', 'expense')->orWhere('type', 'other')->get();
             })
         ]);
 
@@ -103,7 +103,7 @@ class IncomeCrudController extends CrudController
             'name' => 'currency_id',
             'entity' => 'currency',
             'options' => (function ($query) {
-               return $query->orderBy('name')->get();
+                return $query->orderBy('name')->get();
             }),
             'default'   => $defaultCurrency->id,
         ]);
@@ -131,7 +131,7 @@ class IncomeCrudController extends CrudController
 
     private function setupFilters()
     {
-        $categories = Category::whereIn('type', ['other', 'income'])->get();
+        $categories = Category::whereIn('type', ['other', 'expense'])->get();
         $options = [];
 
         foreach($categories as $category) {
@@ -147,14 +147,14 @@ class IncomeCrudController extends CrudController
         });
 
         $this->crud->addFilter([
-           'type'   => 'date_range',
-           'name'   => 'from_to',
-           'label'  => trans('expensed::base.date_range'),
+            'type'   => 'date_range',
+            'name'   => 'from_to',
+            'label'  => trans('expensed::base.date_range'),
         ], false,
-        function ($range) {
-            $dates = json_decode($range);
-            $this->crud->addClause('where', 'entry_date', '>=', $dates->from);
-            $this->crud->addClause('where', 'entry_date', '<=', $dates->to);
-        });
+            function ($range) {
+                $dates = json_decode($range);
+                $this->crud->addClause('where', 'entry_date', '>=', $dates->from);
+                $this->crud->addClause('where', 'entry_date', '<=', $dates->to);
+            });
     }
 }
