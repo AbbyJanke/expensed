@@ -30,7 +30,6 @@ class ExpenseRequest extends FormRequest
             'amount'        => 'required',
             'category_id'      => 'required|exists:categories,id',
             'currency_id'      => 'required|exists:currencies,id',
-            // 'name' => 'required|min:5|max:255'
         ];
     }
 

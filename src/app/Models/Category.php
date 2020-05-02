@@ -50,7 +50,9 @@ class Category extends Model
     */
     public function countEntries()
     {
-        return $this->entries()->count();
+        $incomeCount = $this->income()->count();
+        $expenseCount = $this->expenses()->count();
+        return $incomeCount + $expenseCount;
     }
 
     public function yearTotal($year = null)
@@ -59,7 +61,9 @@ class Category extends Model
             $year = date('Y');
         }
 
-        return $this->entries()->whereYear('entry_date', $year)->count();
+        $incomeCount = $this->income()->whereYear('entry_date', $year)->count();
+        $expenseCount = $this->expenses()->whereYear('entry_date', $year)->count();
+        return $incomeCount + $expenseCount;
     }
 
     /*
@@ -73,9 +77,19 @@ class Category extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function entries()
+    public function income()
     {
         return $this->hasMany(Income::class, 'category_id');
+    }
+
+    /**
+     * What kind of income was it?
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class, 'category_id');
     }
 
     /*
