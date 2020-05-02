@@ -26,6 +26,10 @@ class ExpenseRequest extends FormRequest
     public function rules()
     {
         return [
+            'entry_date'    => 'date',
+            'amount'        => 'required',
+            'category_id'      => 'required|exists:categories,id',
+            'currency_id'      => 'required|exists:currencies,id',
             // 'name' => 'required|min:5|max:255'
         ];
     }
