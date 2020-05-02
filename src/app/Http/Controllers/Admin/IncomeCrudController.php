@@ -85,7 +85,7 @@ class IncomeCrudController extends CrudController
             'name'  => 'entry_date',
             'label' => trans('expensed::base.date_received'),
         ]);
-        $this->crud->addField([  // Select
+        $this->crud->addField([
             'label' => trans('expensed::base.category'),
             'type' => 'select',
             'name' => 'category_id',
@@ -97,7 +97,7 @@ class IncomeCrudController extends CrudController
 
         $defaultCurrency = Currency::where('code', config('backpack.expensed.default_currency'))->first();
 
-        $this->crud->addField([  // Select
+        $this->crud->addField([
             'label' => trans('expensed::base.currency'),
             'type' => 'select',
             'name' => 'currency_id',
@@ -142,7 +142,7 @@ class IncomeCrudController extends CrudController
             'name' => 'category',
             'type' => 'dropdown',
             'label'=> trans('expensed::base.category')
-        ], $options, function($value) { // if the filter is active
+        ], $options, function($value) {
             $this->crud->addClause('where', 'category_id', $value);
         });
 

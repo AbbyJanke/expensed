@@ -24,7 +24,7 @@ class ExpenseCrudController extends CrudController
     {
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Expense');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/expenses');
-        $this->crud->setEntityNameStrings('expense', 'expenses');
+        $this->crud->setEntityNameStrings(trans('expensed::base.expense'), trans('expensed::base.expenses'));
     }
 
     protected function setupListOperation()
@@ -85,7 +85,7 @@ class ExpenseCrudController extends CrudController
             'name'  => 'entry_date',
             'label' => trans('expensed::base.date_paid'),
         ]);
-        $this->crud->addField([  // Select
+        $this->crud->addField([
             'label' => trans('expensed::base.category'),
             'type' => 'select',
             'name' => 'category_id',
@@ -97,7 +97,7 @@ class ExpenseCrudController extends CrudController
 
         $defaultCurrency = Currency::where('code', config('backpack.expensed.default_currency'))->first();
 
-        $this->crud->addField([  // Select
+        $this->crud->addField([
             'label' => trans('expensed::base.currency'),
             'type' => 'select',
             'name' => 'currency_id',
@@ -142,7 +142,7 @@ class ExpenseCrudController extends CrudController
             'name' => 'category',
             'type' => 'dropdown',
             'label'=> trans('expensed::base.category')
-        ], $options, function($value) { // if the filter is active
+        ], $options, function($value) {
             $this->crud->addClause('where', 'category_id', $value);
         });
 

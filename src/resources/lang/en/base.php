@@ -24,12 +24,13 @@ return [
     'date_received'     => 'Date Received',
     'added_by'          => 'Added By',
 
-    'other'             => 'Other',
     'expense'           => 'Expense',
+    'expenses'          => 'Expenses',
     'date_paid'         => 'Date Paid',
 
     'amount'            => 'Amount',
     'exchanged_amount'  => 'Exchanged Amount',
+    'other'             => 'Other',
 
     /* Filters */
     'type_filter'        => 'Type',
