@@ -23,7 +23,7 @@ class ExpenseCrudController extends CrudController
     public function setup()
     {
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Expense');
-        $this->crud->setRoute(config('backpack.base.route_prefix') . '/expenses');
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/expenses');
         $this->crud->setEntityNameStrings(trans('expensed::base.expense'), trans('expensed::base.expenses'));
     }
 

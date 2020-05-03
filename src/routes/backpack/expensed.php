@@ -13,10 +13,11 @@
 Route::group([
     'namespace'  => 'AbbyJanke\Expensed\app\Http\Controllers\Admin',
     'middleware' => ['web', config('backpack.base.middleware_key', 'admin')],
-    'prefix'     => config('backpack.base.route_prefix', 'admin'),
+    'prefix'     => config('backpack.base.route_prefix', 'admin').'/money',
 ], function () {
-    Route::crud('currency', 'CurrencyCrudController');
-    Route::crud('expenses/category', 'CategoryCrudController');
-    Route::crud('expenses/income', 'IncomeCrudController');
+    Route::crud('income', 'IncomeCrudController');
     Route::crud('expenses', 'ExpenseCrudController');
+    Route::get('reports', 'ReportsController@index');
+    Route::crud('categories', 'CategoryCrudController');
+    Route::crud('currencies', 'CurrencyCrudController');
 });

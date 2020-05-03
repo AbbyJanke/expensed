@@ -21,7 +21,7 @@ class CategoryCrudController extends CrudController
     public function setup()
     {
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Category');
-        $this->crud->setRoute(config('backpack.base.route_prefix') . '/expenses/category');
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/categories');
         $this->crud->setEntityNameStrings(trans('expensed::base.categories'), trans('expensed::base.categories'));
     }
 

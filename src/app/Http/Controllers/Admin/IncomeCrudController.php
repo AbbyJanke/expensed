@@ -23,7 +23,7 @@ class IncomeCrudController extends CrudController
     public function setup()
     {
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
-        $this->crud->setRoute(config('backpack.base.route_prefix') . '/expenses/income');
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/income');
         $this->crud->setEntityNameStrings(trans('expensed::base.income'), trans('expensed::base.incomes'));
     }
 

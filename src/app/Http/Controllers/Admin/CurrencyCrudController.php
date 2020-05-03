@@ -22,7 +22,7 @@ class CurrencyCrudController extends CrudController
     public function setup()
     {
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Currency');
-        $this->crud->setRoute(config('backpack.base.route_prefix') . '/currency');
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/currencies');
         $this->crud->setEntityNameStrings(trans('expensed::base.currency'), trans('expensed::base.currencies'));
 
         $this->crud->denyAccess('create');

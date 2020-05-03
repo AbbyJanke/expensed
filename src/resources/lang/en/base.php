@@ -28,6 +28,8 @@ return [
     'expenses'          => 'Expenses',
     'date_paid'         => 'Date Paid',
 
+    'reports'           => 'Reports',
+
     'amount'            => 'Amount',
     'exchanged_amount'  => 'Exchanged Amount',
     'other'             => 'Other',
