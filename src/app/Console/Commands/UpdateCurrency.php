@@ -39,6 +39,10 @@ class UpdateCurrency extends Command
      */
     public function handle()
     {
+        if(!is_null(config('backpack.expensed.api_token'))) {
+            $this->error('Please enter your OpenExchangeRates.com API Token');
+        }
+
         $currencyRates = Http::get(getCurrencyURL('latest', '&show_alternative=true'))['rates'];
         foreach($currencyRates as $code => $currencyRate) {
             if(!$currency = Currency::where('code', $code)->first()) {

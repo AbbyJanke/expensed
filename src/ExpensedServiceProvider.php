@@ -26,7 +26,6 @@ class ExpensedServiceProvider extends ServiceProvider
         $this->loadViews();
 
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
-
         $this->loadTranslationsFrom(__DIR__.'/resources/lang', 'expensed');
 
         // use the vendor configuration file as fallback
@@ -60,7 +59,8 @@ class ExpensedServiceProvider extends ServiceProvider
             $this->commands([
                 \AbbyJanke\Expensed\App\Console\Commands\CleanupCurrency::class,
                 \AbbyJanke\Expensed\App\Console\Commands\InstallCurrency::class,
-                \AbbyJanke\Expensed\App\Console\Commands\UpdateCurrency::class
+                \AbbyJanke\Expensed\App\Console\Commands\UpdateCurrency::class,
+                \AbbyJanke\Expensed\App\Console\Commands\InstallCommand::class
             ]);
         }
     }

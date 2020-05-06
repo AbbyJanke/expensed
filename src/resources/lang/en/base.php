@@ -36,6 +36,8 @@ return [
 
     /* Filters */
     'type_filter'        => 'Type',
+    'entry_date'        => 'Entry Date',
+    'entry_type'        => 'Entry Type',
     'date_range'        => 'Date Range',
 
 ];

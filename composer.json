@@ -26,9 +26,6 @@
       "cknow/laravel-money": "^4.0"
   },
   "extra": {
-      "branch-alias": {
-          "dev-master": "dev"
-      },
       "laravel": {
           "providers": [
               "AbbyJanke\\Expensed\\ExpensedServiceProvider"

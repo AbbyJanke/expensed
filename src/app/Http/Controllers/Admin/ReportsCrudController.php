@@ -52,10 +52,10 @@ class ReportsCrudController extends CrudController
         $this->crud->addColumn([
             'type'  => 'date',
             'name'  => 'entry_date',
-            'label' => trans('expensed::base.date_received'),
+            'label' => trans('expensed::base.entry_date'),
         ]);
         $this->crud->addColumn([
-            'label' => 'Category',
+            'label' => trans('expensed::base.category'),
             'type' => "select",
             'name' => 'category_id',
             'entity' => 'category',
@@ -195,10 +195,10 @@ class ReportsCrudController extends CrudController
         $this->crud->addFilter([
             'name' => 'type',
             'type' => 'dropdown',
-            'label'=> 'Entry Type'
+            'label'=> trans('expensed::base.entry_type')
         ], [
-            'income' => 'Income',
-            'expense' => 'Expense',
+            'income' => trans('expensed::base.income'),
+            'expense' => trans('expensed::base.expense'),
         ], function($value) {
             if($value == 'expense') {
                 $this->crud->setModel('AbbyJanke\Expensed\App\Models\Expense');
@@ -209,7 +209,7 @@ class ReportsCrudController extends CrudController
             $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
         });
 
-        $categories = Category::whereIn('type', ['other', 'income'])->get();
+        $categories = Category::get();
         $categoryOptions = [];
 
         foreach($categories as $category) {

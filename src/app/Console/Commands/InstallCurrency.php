@@ -39,6 +39,10 @@ class InstallCurrency extends Command
      */
     public function handle()
     {
+        if(!is_null(config('backpack.expensed.api_token'))) {
+            $this->error('Please enter your OpenExchangeRates.com API Token');
+        }
+
         $currencyRates = Http::get(getCurrencyURL('latest', '&show_alternative=true'))['rates'];
         $currencies = Http::get(getCurrencyURL('currencies'))->json();
 
