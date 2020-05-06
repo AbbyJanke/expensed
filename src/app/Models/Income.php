@@ -109,6 +109,7 @@ class Income extends Model
     */
     public function setAmountAttribute($value)
     {
+        dd($value);
         $this->attributes['amount'] = str_replace(',', '', substr($value, 2));
     }
 }
