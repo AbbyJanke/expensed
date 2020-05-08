@@ -89,7 +89,7 @@ class ExpensedServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/resources/lang' => resource_path('lang/vendor/expensed'),
             __DIR__.'/resources/views' => resource_path('views/vendor/expensed'),
-            __DIR__.__DIR__.'/config/backpack/expensed.php' => config_path('backpack/expensed.php'),
+            __DIR__.'/config/backpack/expensed.php' => config_path('backpack/expensed.php'),
         ]);
     }
 
