@@ -16,21 +16,35 @@ class ExpenseCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as storeTrait; }
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { edit as editTrait; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation { show as showTrait; }
 
     public function setup()
     {
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Expense');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/expenses');
         $this->crud->setEntityNameStrings(trans('expensed::base.expense'), trans('expensed::base.expenses'));
+
+        $this->setupFilters();
+
+        if(config('backpack.expensed.private_expense')) {
+            $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
+        } else {
+            $this->crud->addFilter([
+                'name' => 'added_by',
+                'type' => 'select2_ajax',
+                'label'=> 'Added By',
+                'placeholder' => 'Added By'
+            ], url(backpack_url('money/ajax/users')),
+                function($value) {
+                    $this->crud->addClause('where', 'added_by_id', $value);
+                });
+        }
     }
 
     protected function setupListOperation()
     {
-        $this->setupFilters();
-
         $this->crud->addColumn([
             'type'  => 'view',
             'name'  => 'amount',
@@ -113,6 +127,22 @@ class ExpenseCrudController extends CrudController
             'type'  => 'textarea',
             'name'  => 'comments',
         ]);
+    }
+
+    public function show($id)
+    {
+        if(!$this->crud->getEntry($id)->added_by_id == backpack_user()->id) {
+            $this->crud->denyAccess('show');
+        }
+        return $this->showTrait($id);
+    }
+
+    public function edit($id)
+    {
+        if(!$this->crud->getEntry($id)->added_by_id == backpack_user()->id) {
+            $this->crud->denyAccess('update');
+        }
+        return $this->editTrait($id);
     }
 
     protected function setupUpdateOperation()

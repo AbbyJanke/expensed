@@ -18,9 +18,9 @@ class IncomeCrudController extends CrudController
 {
     use \Backpack\CRUD\app\Http\Controllers\Operations\ListOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation { store as storeTrait; }
-    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation { edit as editTrait; }
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation { show as showTrait; }
 
     public function setup()
     {
@@ -111,9 +111,7 @@ class IncomeCrudController extends CrudController
                 return $query->where('type', 'income')->orWhere('type', 'other')->get();
             })
         ]);
-
         $defaultCurrency = Currency::where('code', config('backpack.expensed.default_currency'))->first();
-
         $this->crud->addField([
             'label' => trans('expensed::base.currency'),
             'type' => 'select',
@@ -124,12 +122,27 @@ class IncomeCrudController extends CrudController
             }),
             'default'   => $defaultCurrency->id,
         ]);
-
         $this->crud->addField([
             'label' => trans('expensed::base.comments'),
             'type'  => 'textarea',
             'name'  => 'comments',
         ]);
+    }
+
+    public function show($id)
+    {
+        if(!$this->crud->getEntry($id)->added_by_id == backpack_user()->id) {
+            $this->crud->denyAccess('show');
+        }
+        return $this->showTrait($id);
+    }
+
+    public function edit($id)
+    {
+        if(!$this->crud->getEntry($id)->added_by_id == backpack_user()->id) {
+            $this->crud->denyAccess('update');
+        }
+        return $this->editTrait($id);
     }
 
     protected function setupUpdateOperation()

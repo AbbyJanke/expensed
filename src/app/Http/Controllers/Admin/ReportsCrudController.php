@@ -73,6 +73,8 @@ class ReportsCrudController extends CrudController
 
         $this->setupFilters();
 
+        //$this->crud->addClause('where', 'added_by_id', backpack_user()->id);
+
         $this->data['widgets']['after_content'] = $this->setupWidgets();
     }
 
@@ -202,11 +204,15 @@ class ReportsCrudController extends CrudController
         ], function($value) {
             if($value == 'expense') {
                 $this->crud->setModel('AbbyJanke\Expensed\App\Models\Expense');
+                if(config('backpack.expensed.private_expense')) {
+                    $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
+                }
             } else {
                 $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
+                if($this->crud->getRequest()->request->has('type') && config('backpack.expensed.private_income')) {
+                    $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
+                }
             }
-        }, function($value) {
-            $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
         });
 
         $categories = Category::get();

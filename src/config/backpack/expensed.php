@@ -15,7 +15,7 @@ return [
     /*
      * Should the expenses entries be viewable to all or only viewable by the creator.
      */
-    'private_expense' => true,
+    'private_expense' => false,
 
     /*
      * API Token received from your service provider.
