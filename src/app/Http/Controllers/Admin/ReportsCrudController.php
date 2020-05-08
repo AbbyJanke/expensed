@@ -240,22 +240,10 @@ class ReportsCrudController extends CrudController
             'type' => 'select2_ajax',
             'label'=> 'Currency',
             'placeholder' => 'Pick a currency'
-        ],
-            url(backpack_url('money/reports/ajax-currency-options')), // the ajax route
-            function($value) { // if the filter is active
-                $this->crud->addClause('where', 'currency_id', $value);
+        ], url(backpack_url('money/ajax/currency')), // the ajax route
+         function($value) { // if the filter is active
+            $this->crud->addClause('where', 'currency_id', $value);
         });
-    }
-
-    /**
-     * Get currency options for an AJAX request.
-     *
-     * @return mixed
-     */
-    public function currencyOptions() {
-        $term = $this->crud->getRequest()->request->get('term');
-        $options = Currency::where('name', 'like', '%'.$term.'%')->orWhere('code', 'like', '%'.$term.'%')->get()->pluck('name', 'id');
-        return $options;
     }
 
 }

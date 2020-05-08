@@ -5,7 +5,9 @@ namespace AbbyJanke\Expensed\App\Http\Controllers\Admin;
 use AbbyJanke\Expensed\App\Http\Requests\IncomeRequest;
 use AbbyJanke\Expensed\App\Models\Category;
 use AbbyJanke\Expensed\App\Models\Currency;
+use App\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
+use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
  * Class IncomeCrudController
@@ -25,11 +27,26 @@ class IncomeCrudController extends CrudController
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/income');
         $this->crud->setEntityNameStrings(trans('expensed::base.income'), trans('expensed::base.incomes'));
+
+        $this->setupFilters();
+
+        if(config('backpack.expensed.private_income')) {
+            $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
+        } else {
+            $this->crud->addFilter([
+                'name' => 'added_by',
+                'type' => 'select2_ajax',
+                'label'=> 'Added By',
+                'placeholder' => 'Added By'
+            ], url(backpack_url('money/ajax/users')),
+            function($value) {
+                $this->crud->addClause('where', 'added_by_id', $value);
+            });
+        }
     }
 
     protected function setupListOperation()
     {
-        $this->setupFilters();
 
         $this->crud->addColumn([
             'type'  => 'view',
