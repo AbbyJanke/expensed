@@ -5,7 +5,6 @@ namespace AbbyJanke\Expensed\App\Http\Controllers\Admin;
 use AbbyJanke\Expensed\App\Http\Requests\IncomeRequest;
 use AbbyJanke\Expensed\App\Models\Category;
 use AbbyJanke\Expensed\App\Models\Currency;
-use App\User;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
@@ -33,100 +32,81 @@ class IncomeCrudController extends CrudController
         if(config('backpack.expensed.private_income')) {
             $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
         } else {
-            $this->crud->addFilter([
-                'name' => 'added_by',
-                'type' => 'select2_ajax',
-                'label'=> 'Added By',
-                'placeholder' => 'Added By'
-            ], url(backpack_url('money/ajax/users')),
-            function($value) {
-                $this->crud->addClause('where', 'added_by_id', $value);
-            });
+            CRUD::filter('added_by')
+                ->type('select2_ajax')
+                ->label(trans('expensed::base.added_by'))
+                ->placeholder(trans('expensed::base.added_by'))
+                ->values(backpack_url('money/ajax/users'))
+                ->whenActive(function($value) {
+                    $this->crud->addClause('where', 'added_by_id', $value);
+                })->apply();
         }
     }
 
     protected function setupListOperation()
     {
-
-        $this->crud->addColumn([
-            'type'  => 'view',
-            'name'  => 'amount',
-            'label' => trans('expensed::base.amount'),
-            'view' => 'expensed::columns.money'
-        ]);
-        $this->crud->addColumn([
-            'label' => trans('expensed::base.currency'),
-            'type' => 'view',
-            'name' => 'currency',
-            'entity' => 'currency',
-            'attribute' => 'code',
-            'symbol'    => true,
-            'model' => 'AbbyJanke\Expensed\App\Models\Currency',
-            'view' => 'expensed::columns.currency_symbol'
-        ]);
-        $this->crud->addColumn([
-            'label' => trans('expensed::base.exchanged_amount'),
-            'type' => 'view',
-            'name' => 'exchanged',
-            'entity' => 'currency',
-            'attribute' => 'exchange_rate',
-            'model' => 'AbbyJanke\Expensed\App\Models\Currency',
-            'view' => 'expensed::columns.exchanged'
-        ]);
-        $this->crud->addColumn([
-            'type'  => 'date',
-            'name'  => 'entry_date',
-            'label' => trans('expensed::base.date_received'),
-        ]);
-        $this->crud->addColumn([
-            'label' => trans('expensed::base.added_by'),
-            'type' => 'select',
-            'name' => 'added_by_id',
-            'entity' => 'added_by',
-            'attribute' => 'name',
-            'model' => config('backpack.base.user_model_fqn'),
-        ]);
+        CRUD::column('amount')
+            ->type('view')
+            ->label(trans('expensed::base.amount'))
+            ->view('expensed::columns.money');
+        CRUD::column('currency')
+            ->type('view')
+            ->label(trans('expensed::base.currency'))
+            ->entity('currency')
+            ->attribute('code')
+            ->symbol(true)
+            ->model('AbbyJanke\Expensed\App\Models\Currency')
+            ->view('expensed::columns.currency_symbol');
+        CRUD::column('exchange_rate')
+            ->type('view')
+            ->label(trans('expensed::base.exchanged_amount'))
+            ->entity('currency')
+            ->attribute('exchange_rate')
+            ->model('AbbyJanke\Expensed\App\Models\Currency')
+            ->view('expensed::columns.exchanged');
+        CRUD::column('entry_date')
+            ->type('date')
+            ->label(trans('expensed::base.date_received'));
+        CRUD::column('added_by_id')
+            ->type('select')
+            ->label(trans('expensed::base.added_by'))
+            ->entity('added_by')
+            ->attribute('name')
+            ->model(config('backpack.base.user_model_fqn'));
     }
 
     protected function setupCreateOperation()
     {
-        $this->crud->addField([
-            'name'   => 'amount',
-            'label'  => trans('expensed::base.amount'),
-            'type'   => 'currency',
-            'view_namespace'    => 'expensed::fields'
-        ]);
         $this->crud->setValidation(IncomeRequest::class);
-        $this->crud->addField([
-            'type'  => 'date',
-            'name'  => 'entry_date',
-            'label' => trans('expensed::base.date_received'),
-        ]);
-        $this->crud->addField([
-            'label' => trans('expensed::base.category'),
-            'type' => 'select',
-            'name' => 'category_id',
-            'entity' => 'category',
-            'options'   => (function ($query) {
-                return $query->where('type', 'income')->orWhere('type', 'other')->get();
-            })
-        ]);
         $defaultCurrency = Currency::where('code', config('backpack.expensed.default_currency'))->first();
-        $this->crud->addField([
-            'label' => trans('expensed::base.currency'),
-            'type' => 'select',
-            'name' => 'currency_id',
-            'entity' => 'currency',
-            'options' => (function ($query) {
-               return $query->orderBy('name')->get();
-            }),
-            'default'   => $defaultCurrency->id,
-        ]);
-        $this->crud->addField([
-            'label' => trans('expensed::base.comments'),
-            'type'  => 'textarea',
-            'name'  => 'comments',
-        ]);
+
+        CRUD::field('amount')
+            ->type('currency')
+            ->label(trans('expensed::base.amount'))
+            ->view_namespace('expensed::fields');
+        CRUD::field('entry_date')
+            ->type('date')
+            ->label(trans('expensed::base.date_received'));
+        CRUD::field('category_id')
+            ->type('select')
+            ->label(trans('expensed::base.category'))
+            ->entity('category')
+            ->attribute('name')
+            ->options(function ($query) {
+                return $query->where('type', 'income')->orWhere('type', 'other')->get();
+            });
+        CRUD::field('currency_id')
+            ->type('select')
+            ->label(trans('expensed::base.currency'))
+            ->entity('currency')
+            ->attribute('name')
+            ->options(function ($query) {
+                return $query->orderBy('name')->get();
+            })
+            ->default($defaultCurrency->id);
+        CRUD::field('comments')
+            ->type('textarea')
+            ->label(trans('expensed::base.comments'));
     }
 
     public function show($id)
@@ -168,23 +148,22 @@ class IncomeCrudController extends CrudController
             $options[$category->id] = $category->name;
         }
 
-        $this->crud->addFilter([
-            'name' => 'category',
-            'type' => 'dropdown',
-            'label'=> trans('expensed::base.category')
-        ], $options, function($value) {
-            $this->crud->addClause('where', 'category_id', $value);
-        });
+        CRUD::filter('category')
+            ->type('dropdown')
+            ->label(trans('expensed::base.category'))
+            ->values($options)
+            ->whenActive(function($value) {
+                $this->crud->addClause('where', 'category_id', $value);
+            })
+            ->apply();
 
-        $this->crud->addFilter([
-           'type'   => 'date_range',
-           'name'   => 'from_to',
-           'label'  => trans('expensed::base.date_range'),
-        ], false,
-        function ($range) {
-            $dates = json_decode($range);
-            $this->crud->addClause('where', 'entry_date', '>=', $dates->from);
-            $this->crud->addClause('where', 'entry_date', '<=', $dates->to);
-        });
+        CRUD::filter('from_to')
+            ->type('date_range')
+            ->label(trans('expensed::base.date_range'))
+            ->whenActive(function($range) {
+                $dates = json_decode($range);
+                $this->crud->addClause('where', 'entry_date', '>=', $dates->from);
+                $this->crud->addClause('where', 'entry_date', '<=', $dates->to);
+            })->apply();
     }
 }

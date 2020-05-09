@@ -4,6 +4,7 @@ namespace AbbyJanke\Expensed\App\Http\Controllers\Admin;
 
 use AbbyJanke\Expensed\App\Http\Requests\CategoryRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
+use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
  * Class CategoryCrudController
@@ -27,53 +28,44 @@ class CategoryCrudController extends CrudController
 
     protected function setupListOperation()
     {
-        $this->crud->addFilter([
-            'name'          => 'type_filter',
-            'label'         => trans('expensed::base.type_filter'),
-            'type'          => 'dropdown',
-        ], [
-            'other' => 'Other',
-            'income' => 'Incomes',
-            'expense' => 'Expenses',
-        ], function($value) {
-           $this->crud->addClause('where', 'type', $value);
-        });
-
-        $this->crud->addColumn([
-           'name'           => 'name',
-           'label'          => trans('backpack::base.name')
-        ]);
-        $this->crud->addColumn([
-            'name'          => 'type',
-            'label'         => trans('expensed::base.category_type'),
-        ]);
-        $this->crud->addColumn([
-            'name'          => 'this_year',
-            'type'          => 'model_function',
-            'label'         => trans('expensed::base.this_year_entries'),
-            'function_name' => 'yearTotal',
-        ]);
-        $this->crud->addColumn([
-            'name'          => 'entry_count',
-            'type'          => 'model_function',
-            'label'         => trans('expensed::base.total_entries'),
-            'function_name' => 'countEntries',
-        ]);
-        $this->crud->addColumn([
-            'name'          => 'created_at',
-            'type'          => 'text',
-            'label'         => trans('expensed::base.date_created')
-        ]);
+        CRUD::filter('type')
+            ->type('dropdown')
+            ->label(trans('expensed::base.type_filter'))
+            ->values([
+                'other' => trans('expensed::base.other'),
+                'income' => trans('expensed::base.income'),
+                'expense' => trans('expensed::base.expenses'),
+            ])
+            ->whenActive(function($value) {
+                $this->crud->addClause('where', 'type', $value);
+            });
+        CRUD::column('name')
+            ->label(trans('backpack::base.name'));
+        CRUD::column('type')
+            ->label(trans('expensed::base.category_type'));
+        CRUD::column('this_year')
+            ->type('model_function')
+            ->label(trans('expensed::base.this_year_entries'))
+            ->function_name('yearTotal');
+        CRUD::column('entry_count')
+            ->type('model_function')
+            ->label(trans('expensed::base.total_entries'))
+            ->function_name('countEntries');
+        CRUD::column('created_at')
+            ->type('date')
+            ->label(trans('expensed::base.date_created'));
     }
 
     protected function setupCreateOperation()
     {
         $this->crud->setValidation(CategoryRequest::class);
+
         $this->crud->addField([
             'name'           => 'name',
             'type'           => 'text',
             'label'          => trans('backpack::base.name')
         ]);
+
         $this->crud->addField([
             'name'           => 'type',
             'label'          => trans('expensed::base.category_type'),
@@ -84,6 +76,7 @@ class CategoryCrudController extends CrudController
                 'expense'       => trans('expensed::base.expense'),
             ]
         ]);
+
     }
 
     protected function setupUpdateOperation()

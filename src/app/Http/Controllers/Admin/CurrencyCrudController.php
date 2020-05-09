@@ -6,6 +6,7 @@ use App\Http\Requests\CurrencyRequest;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Illuminate\Support\Facades\Route;
 use Prologue\Alerts\Facades\Alert;
+use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
  * Class CurrencyCrudController
@@ -37,28 +38,17 @@ class CurrencyCrudController extends CrudController
     {
         $this->setupFilters();
 
-        $this->crud->addColumn([
-            'name'      => 'code',
-            'label'     => trans('expensed::base.code'),
-        ]);
-        $this->crud->addColumn([
-            'name'      => 'name',
-            'label'     => trans('backpack::base.name'),
-        ]);
-        $this->crud->addColumn([
-            'name'      => 'exchange_rate',
-            'label'     => trans('expensed::base.exchange_rate'),
-        ]);
-        $this->crud->addColumn([
-            'name'       => 'active',
-            'label'     => trans('expensed::base.active_currency'),
-            'type'       => 'check'
-        ]);
-        $this->crud->addColumn([
-           'name'       => 'updated_at',
-            'label'     => trans('expensed::base.last_update'),
-           'type'       => 'datetime'
-        ]);
+        CRUD::column('code')
+            ->label(trans('expensed::base.code'));
+        CRUD::column('name')
+            ->label(trans('backpack::base.name'));
+        CRUD::column('exchange_rate')
+            ->label(trans('expensed::base.exchange_rate'));
+        CRUD::column('active')
+            ->type('check')
+            ->label(trans('expensed::base.active_currency'));
+        CRUD::column('updated_at')
+            ->label(trans('expensed::base.last_update'));
     }
 
     /**
@@ -93,16 +83,16 @@ class CurrencyCrudController extends CrudController
 
     protected function setupFilters()
     {
-        $this->crud->addFilter([
-            'name' => 'status',
-            'type' => 'dropdown',
-            'label'=> 'Status'
-        ], [
-            1 => 'Is Active',
-            0 => 'Not Active',
-        ], function($value) { // if the filter is active
-            $this->crud->addClause('where', 'active', $value);
-        });
+        CRUD::filter('status')
+            ->type('dropdown')
+            ->label(trans('expensed::base.status'))
+            ->values([
+                1 => 'Is Active',
+                0 => 'Not Active',
+            ])
+            ->whenActive(function($value) { // if the filter is active
+                $this->crud->addClause('where', 'active', $value);
+            });
     }
 
 }
