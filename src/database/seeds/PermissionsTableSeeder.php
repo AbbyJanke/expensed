@@ -5,7 +5,7 @@ namespace AbbyJanke\Expensed\Database\Seeds;
 use Illuminate\Database\Seeder;
 use AbbyJanke\Expensed\App\Models\Category;
 
-class CategoriesTableSeeder extends Seeder
+class PermissionsTableSeeder extends Seeder
 {
 
     /**

@@ -39,7 +39,7 @@ class InstallCommand extends Command
      */
     public function handle()
     {
-        $bar = $this->output->createProgressBar(4);
+        $bar = $this->output->createProgressBar(5);
 
         // using permission manager?
         $usePermissionManager = $this->confirm('Use Backpack/PermissionManager to restrict access?', 'yes');
@@ -71,6 +71,15 @@ class InstallCommand extends Command
         if($this->confirm('Install Default Categories?')) {
             $this->info("\n".'Adding Default Categories');
             Artisan::call('db:seed', ['class' => 'AbbyJanke\Expensed\Database\Seeds\CategoriesTableSeeder']);
+        } else {
+            $this->info("\n".'Skipping Default Categories');
+        }
+        $this->advance();
+
+        // double check to make sure they want default categories
+        if($usePermissionManager && $this->confirm('Install Recommended Permission Names?')) {
+            $this->info("\n".'Adding Recommended Permission Names');
+            Artisan::call('db:seed', ['class' => 'AbbyJanke\Expensed\Database\Seeds\PermissionsTableSeeder']);
         } else {
             $this->info("\n".'Skipping Default Categories');
         }
