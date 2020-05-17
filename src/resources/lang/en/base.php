@@ -35,6 +35,7 @@ return [
     'other'             => 'Other',
 
     /* Filters */
+    'status'            => 'Status',
     'type_filter'        => 'Type',
     'entry_date'        => 'Entry Date',
     'entry_type'        => 'Entry Type',

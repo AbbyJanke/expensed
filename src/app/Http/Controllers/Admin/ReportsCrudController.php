@@ -3,10 +3,10 @@
 namespace AbbyJanke\Expensed\App\Http\Controllers\Admin;
 
 use AbbyJanke\Expensed\App\Models\Category;
-use AbbyJanke\Expensed\App\Models\Currency;
 use AbbyJanke\Expensed\App\Models\Expense;
 use AbbyJanke\Expensed\App\Models\Income;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
+use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 
 /**
  * Class ReportsCrudControllerOLD
@@ -24,52 +24,45 @@ class ReportsCrudController extends CrudController
 
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
 
-        $this->crud->addColumn([
-            'type'  => 'view',
-            'name'  => 'amount',
-            'label' => trans('expensed::base.amount'),
-            'view' => 'expensed::columns.money'
-        ]);
-        $this->crud->addColumn([
-            'label' => trans('expensed::base.currency'),
-            'type' => 'view',
-            'name' => 'currency',
-            'entity' => 'currency',
-            'attribute' => 'code',
-            'symbol'    => true,
-            'model' => 'AbbyJanke\Expensed\App\Models\Currency',
-            'view' => 'expensed::columns.currency_symbol'
-        ]);
-        $this->crud->addColumn([
-            'label' => trans('expensed::base.exchanged_amount'),
-            'type' => 'view',
-            'name' => 'exchanged',
-            'entity' => 'currency',
-            'attribute' => 'exchange_rate',
-            'model' => 'AbbyJanke\Expensed\App\Models\Currency',
-            'view' => 'expensed::columns.exchanged'
-        ]);
-        $this->crud->addColumn([
-            'type'  => 'date',
-            'name'  => 'entry_date',
-            'label' => trans('expensed::base.entry_date'),
-        ]);
-        $this->crud->addColumn([
-            'label' => trans('expensed::base.category'),
-            'type' => "select",
-            'name' => 'category_id',
-            'entity' => 'category',
-            'attribute' => "name",
-            'model' => "AbbyJanke\Expensed\App\Models\Category",
-        ]);
-        $this->crud->addColumn([
-            'label' => trans('expensed::base.added_by'),
-            'type' => 'select',
-            'name' => 'added_by_id',
-            'entity' => 'added_by',
-            'attribute' => 'name',
-            'model' => config('backpack.base.user_model_fqn'),
-        ]);
+        if(checkPermission() && backpack_user()->hasPermissionTo(config('backpack.expensed.permissions.reports.view'))) {
+            $this->crud->denyAccess(['list','show','create','update','delete']);
+            $this->crud->allowAccess(['list', 'show']);
+        }
+
+        CRUD::column('amount')
+            ->type('view')
+            ->label(trans('expensed::base.amount'))
+            ->view('expensed::columns.money');
+        CRUD::column('currency')
+            ->type('view')
+            ->label(trans('expensed::base.currency'))
+            ->entity('currency')
+            ->attribute('code')
+            ->symbol(true)
+            ->model('AbbyJanke\Expensed\App\Models\Currency')
+            ->view('expensed::columns.currency_symbol');
+        CRUD::column('exchange_rate')
+            ->type('view')
+            ->label(trans('expensed::base.exchanged_amount'))
+            ->entity('currency')
+            ->attribute('exchange_rate')
+            ->model('AbbyJanke\Expensed\App\Models\Currency')
+            ->view('expensed::columns.exchanged');
+        CRUD::column('entry_date')
+            ->type('date')
+            ->label(trans('expensed::base.date_received'));
+        CRUD::column('category_id')
+            ->type('select')
+            ->label(trans('expensed::base.category'))
+            ->entity('category')
+            ->attribute('name')
+            ->model('AbbyJanke\Expensed\App\Models\Category');;
+        CRUD::column('added_by_id')
+            ->type('select')
+            ->label(trans('expensed::base.added_by'))
+            ->entity('added_by')
+            ->attribute('name')
+            ->model(config('backpack.base.user_model_fqn'));
 
         $this->setupFilters();
 
@@ -192,22 +185,26 @@ class ReportsCrudController extends CrudController
      */
     private function setupFilters()
     {
-        $this->crud->addFilter([
-            'name' => 'type',
-            'type' => 'dropdown',
-            'label'=> trans('expensed::base.entry_type')
-        ], [
-            'income' => trans('expensed::base.income'),
-            'expense' => trans('expensed::base.expense'),
-        ], function($value) {
-            if($value == 'expense') {
-                $this->crud->setModel('AbbyJanke\Expensed\App\Models\Expense');
-            } else {
-                $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
-            }
-        }, function($value) {
-            $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
-        });
+        CRUD::filter('type')
+            ->type('dropdown')
+            ->label(trans('expensed::base.entry_type'))
+            ->values([
+                'income' => trans('expensed::base.income'),
+                'expense' => trans('expensed::base.expense'),
+            ])
+            ->whenActive(function($value) {
+                if($value == 'expense') {
+                    $this->crud->setModel('AbbyJanke\Expensed\App\Models\Expense');
+                    if(config('backpack.expensed.private_expense')) {
+                        $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
+                    }
+                } else {
+                    $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
+                    if($this->crud->getRequest()->request->has('type') && config('backpack.expensed.private_income')) {
+                        $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
+                    }
+                }
+            })->apply();
 
         $categories = Category::get();
         $categoryOptions = [];
@@ -216,46 +213,39 @@ class ReportsCrudController extends CrudController
             $categoryOptions[$category->id] = $category->name;
         }
 
-        $this->crud->addFilter([
-            'name' => 'category',
-            'type' => 'dropdown',
-            'label'=> trans('expensed::base.category')
-        ], $categoryOptions, function($value) {
-            $this->crud->addClause('where', 'category_id', $value);
-        });
-
-        $this->crud->addFilter([
-            'type'   => 'date_range',
-            'name'   => 'from_to',
-            'label'  => trans('expensed::base.date_range'),
-        ], false,
-            function ($range) {
+        CRUD::filter('category')
+            ->type('dropdown')
+            ->label(trans('expensed::base.category'))
+            ->values($categoryOptions)
+            ->whenActive(function($value) {
+                $this->crud->addClause('where', 'category_id', $value);
+            });
+        CRUD::filter('from_to')
+            ->type('date_range')
+            ->label(trans('expensed::base.date_range'))
+            ->whenActive(function ($range) {
                 $dates = json_decode($range);
                 $this->crud->addClause('where', 'entry_date', '>=', $dates->from);
                 $this->crud->addClause('where', 'entry_date', '<=', $dates->to);
-        });
-
-        $this->crud->addFilter([
-            'name' => 'currency_id',
-            'type' => 'select2_ajax',
-            'label'=> 'Currency',
-            'placeholder' => 'Pick a currency'
-        ],
-            url(backpack_url('money/reports/ajax-currency-options')), // the ajax route
-            function($value) { // if the filter is active
+            });
+        CRUD::filter('currency_id')
+            ->type('select2_ajax')
+            ->label(trans('expensed::base.currency'))
+            ->placeholder(trans('expensed:base.pick_currency'))
+            ->values(backpack_url('money/ajax/currency'))
+            ->whenActive(function($value) { // if the filter is active
                 $this->crud->addClause('where', 'currency_id', $value);
-        });
-    }
-
-    /**
-     * Get currency options for an AJAX request.
-     *
-     * @return mixed
-     */
-    public function currencyOptions() {
-        $term = $this->crud->getRequest()->request->get('term');
-        $options = Currency::where('name', 'like', '%'.$term.'%')->orWhere('code', 'like', '%'.$term.'%')->get()->pluck('name', 'id');
-        return $options;
+            });
+        if(checkPermission() && backpack_user()->hasPermissionTo(config('backpack.expensed.permissions.users.view_users'))) {
+            CRUD::filter('added_by')
+                ->type('select2_ajax')
+                ->label(trans('expensed::base.added_by'))
+                ->placeholder(trans('expensed::base.added_by'))
+                ->values(backpack_url('money/ajax/users'))
+                ->whenActive(function ($value) {
+                    $this->crud->addClause('where', 'added_by_id', $value);
+                })->apply();
+        }
     }
 
 }

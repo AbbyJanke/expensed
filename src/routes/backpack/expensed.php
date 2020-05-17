@@ -18,7 +18,9 @@ Route::group([
     Route::crud('income', 'IncomeCrudController');
     Route::crud('expenses', 'ExpenseCrudController');
     Route::crud('reports', 'ReportsCrudController');
-    Route::get('reports/ajax-currency-options', 'ReportsCrudController@currencyOptions');
     Route::crud('categories', 'CategoryCrudController');
     Route::crud('currencies', 'CurrencyCrudController');
+
+    Route::get('ajax/users', 'AjaxController@userOptions');
+    Route::get('ajax/currency', 'AjaxController@currencyOptions');
 });

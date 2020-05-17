@@ -39,21 +39,29 @@ class UpdateCurrency extends Command
      */
     public function handle()
     {
-        if(!is_null(config('backpack.expensed.api_token'))) {
+        if(is_null(config('backpack.expensed.api_token'))) {
             $this->error('Please enter your OpenExchangeRates.com API Token');
-        }
+            return;
+        } else {
+            $this->info("\n".'Updating Currencies..');
+            $currencyRates = Http::get(getCurrencyURL('latest', '&show_alternative=true'))['rates'];
 
-        $currencyRates = Http::get(getCurrencyURL('latest', '&show_alternative=true'))['rates'];
-        foreach($currencyRates as $code => $currencyRate) {
-            if(!$currency = Currency::where('code', $code)->first()) {
-                $currency = $this->currencyNotFound($code);
+            $bar = $this->output->createProgressBar(count($currencyRates));
+            foreach($currencyRates as $code => $currencyRate) {
+                if(!$currency = Currency::where('code', $code)->first()) {
+                    $currency = $this->currencyNotFound($code);
+                }
+
+                $currency->exchange_rate = $currencyRate;
+                $currency->save();
+
+                $bar->advance();
             }
 
-            $currency->exchange_rate = $currencyRate;
-            $currency->save();
+            $bar->finish();
+            $this->info("\n".'Currencies Successfully Updated.');
+            return;
         }
-
-        return;
     }
 
     /**

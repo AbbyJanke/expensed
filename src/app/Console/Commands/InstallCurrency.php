@@ -39,23 +39,33 @@ class InstallCurrency extends Command
      */
     public function handle()
     {
-        if(!is_null(config('backpack.expensed.api_token'))) {
-            $this->error('Please enter your OpenExchangeRates.com API Token');
+        $this->info("\n".'Attempting To Install New Currency Rates..');
+
+        if(is_null(config('backpack.expensed.api_token'))) {
+            $this->error("\n".'Please enter your OpenExchangeRates.com API Token');
+            return;
         }
 
         $currencyRates = Http::get(getCurrencyURL('latest', '&show_alternative=true'))['rates'];
         $currencies = Http::get(getCurrencyURL('currencies'))->json();
+        $inactiveCurrencies = Http::get(getCurrencyURL('currencies', '&only_alternative=true'))->json();
+        $totalCurrencyCount = count($currencies) + count($inactiveCurrencies);
+
+        $bar = $this->output->createProgressBar($totalCurrencyCount);
 
         foreach($currencies as $code => $name) {
             $this->createNewCurrency($name, $code, $currencyRates[$code], true);
+            $bar->advance();
         }
-
-        $inactiveCurrencies = Http::get(getCurrencyURL('currencies', '&only_alternative=true'))->json();
 
         foreach($inactiveCurrencies as $code => $name) {
             $this->createNewCurrency($name, $code, $currencyRates[$code]);
+            $bar->advance();
         }
 
+        $bar->finish();
+
+        $this->info("\n".'Currencies Successfully Installed.');
         return;
     }
 
