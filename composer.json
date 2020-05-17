@@ -25,6 +25,9 @@
       "backpack/crud": "^4.1",
       "cknow/laravel-money": "^4.0"
   },
+  "suggest": {
+      "backpack/permissionmanager": "Allows limited access to information only for those that require it."
+  },
   "extra": {
       "laravel": {
           "providers": [
