@@ -23,9 +23,9 @@ Once composer completed the necessary requirements, you should run:
 
 This will install the migrations, currencies and default categories.
 
-**Optional:**  If you have added an Open Exchange Rate App ID to your `.env` I encourage you to setup a scheduled task _(aka cron job)_ to run:
-
-`php artisan currency:update`
+## Options
+1. [Automatically Update Exchange Rates](https://github.com/AbbyJanke/expensed/wiki/Automatically-Update-Currency-Exchange-Rates)
+2. [Limiting Permissions](https://github.com/AbbyJanke/expensed/wiki/Limit-Permissions)
 
 Open Exchange Rates update their exchange rates hourly. The free plan allows up to 1,000 requests per month, with approximately 730 hours per month you SHOULD be able to run it every hour without problem.
 
