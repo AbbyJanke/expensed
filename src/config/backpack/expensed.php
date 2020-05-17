@@ -10,17 +10,12 @@ return [
     /*
      * Should the income entries be viewable to all or only viewable by the creator.
      */
-    'private_income' => false,
+    'private_income' => true,
 
     /*
      * Should the expenses entries be viewable to all or only viewable by the creator.
      */
-    'private_expense' => false,
-
-    /*
-     * API Token received from your service provider.
-     */
-    'api_token' => env('CURRENCY_API_TOKEN', null),
+    'private_expense' => true,
 
     /**
      * Permission Names to be used when verifying access.
@@ -54,6 +49,15 @@ return [
         'users' => [
             'view' => 'view_users',
         ],
+        'override' => [
+            'priv_income' => 'view_priv_income',
+            'priv_expense' => 'view_priv_expense'
+        ]
     ],
+
+    /*
+     * API Token received from your service provider.
+     */
+    'api_token' => env('CURRENCY_API_TOKEN', null),
 
 ];

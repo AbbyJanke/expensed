@@ -45,8 +45,9 @@ class InstallCommand extends Command
         $usePermissionManager = $this->confirm('Use Backpack/PermissionManager to restrict access?', 'yes');
         if($usePermissionManager) {
             $this->info("\n".'Installing Backpack/PermissionManager');
-            $command = 'composer require backpack/permissionmanager --prefer-source';
-            shell_exec($command);
+            $require = 'composer require backpack/permissionmanager --prefer-source';
+            shell_exec($require);
+            Artisan::call('vendor:publish', ['provider'  => 'Spatie\Permission\PermissionServiceProvider',]);
         } else {
             $this->comment('Skipping Backpack/PermissionManager');
         }
