@@ -24,6 +24,26 @@ class CategoryCrudController extends CrudController
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Category');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/categories');
         $this->crud->setEntityNameStrings(trans('expensed::base.categories'), trans('expensed::base.categories'));
+
+        if(checkPermission()) {
+            $this->crud->denyAccess(['list', 'create', 'show', 'update', 'delete']);
+
+            if (backpack_user()->hasPermissionTo('view_categories')) {
+                $this->crud->allowAccess(['list', 'show']);
+            }
+
+            if (backpack_user()->hasPermissionTo('create_categories')) {
+                $this->crud->allowAccess(['create']);
+            }
+
+            if (backpack_user()->hasPermissionTo('edit_categories')) {
+                $this->crud->allowAccess(['update']);
+            }
+
+            if (backpack_user()->hasPermissionTo('delete_categories')) {
+                $this->crud->allowAccess(['delete']);
+            }
+        }
     }
 
     protected function setupListOperation()

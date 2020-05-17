@@ -10,7 +10,6 @@ if (! function_exists('getLatestCurrencyURL')) {
 
         return $serviceURL;
     }
-
 }
 
 if (! function_exists('currencySymbol')) {
@@ -19,6 +18,17 @@ if (! function_exists('currencySymbol')) {
     {
         $currencies = include(__DIR__.'/resources/currencies.php');
         return $currencies[$code]['symbol'];
+    }
+}
+
+if(! function_exists('checkPermission')) {
+
+    function checkPermission() {
+        if(class_exists('Spatie\Permission\Traits\HasRoles')) {
+            return true;
+        }
+
+        return false;
     }
 
 }

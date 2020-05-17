@@ -24,6 +24,11 @@ class ReportsCrudController extends CrudController
 
         $this->crud->setModel('AbbyJanke\Expensed\App\Models\Income');
 
+        if(checkPermission() && backpack_user()->hasPermissionTo(config('backpack.expensed.permissions.reports.view'))) {
+            $this->crud->denyAccess(['list','show','create','update','delete']);
+            $this->crud->allowAccess(['list', 'show']);
+        }
+
         CRUD::column('amount')
             ->type('view')
             ->label(trans('expensed::base.amount'))
@@ -60,8 +65,6 @@ class ReportsCrudController extends CrudController
             ->model(config('backpack.base.user_model_fqn'));
 
         $this->setupFilters();
-
-        //$this->crud->addClause('where', 'added_by_id', backpack_user()->id);
 
         $this->data['widgets']['after_content'] = $this->setupWidgets();
     }
@@ -210,34 +213,39 @@ class ReportsCrudController extends CrudController
             $categoryOptions[$category->id] = $category->name;
         }
 
-        $this->crud->addFilter([
-            'name' => 'category',
-            'type' => 'dropdown',
-            'label'=> trans('expensed::base.category')
-        ], $categoryOptions, function($value) {
-            $this->crud->addClause('where', 'category_id', $value);
-        });
-
-        $this->crud->addFilter([
-            'type'   => 'date_range',
-            'name'   => 'from_to',
-            'label'  => trans('expensed::base.date_range'),
-        ], false,
-            function ($range) {
+        CRUD::filter('category')
+            ->type('dropdown')
+            ->label(trans('expensed::base.category'))
+            ->values($categoryOptions)
+            ->whenActive(function($value) {
+                $this->crud->addClause('where', 'category_id', $value);
+            });
+        CRUD::filter('from_to')
+            ->type('date_range')
+            ->label(trans('expensed::base.date_range'))
+            ->whenActive(function ($range) {
                 $dates = json_decode($range);
                 $this->crud->addClause('where', 'entry_date', '>=', $dates->from);
                 $this->crud->addClause('where', 'entry_date', '<=', $dates->to);
-        });
-
-        $this->crud->addFilter([
-            'name' => 'currency_id',
-            'type' => 'select2_ajax',
-            'label'=> 'Currency',
-            'placeholder' => 'Pick a currency'
-        ], url(backpack_url('money/ajax/currency')), // the ajax route
-         function($value) { // if the filter is active
-            $this->crud->addClause('where', 'currency_id', $value);
-        });
+            });
+        CRUD::filter('currency_id')
+            ->type('select2_ajax')
+            ->label(trans('expensed::base.currency'))
+            ->placeholder(trans('expensed:base.pick_currency'))
+            ->values(backpack_url('money/ajax/currency'))
+            ->whenActive(function($value) { // if the filter is active
+                $this->crud->addClause('where', 'currency_id', $value);
+            });
+        if(checkPermission() && backpack_user()->hasPermissionTo(config('backpack.expensed.permissions.users.view_users'))) {
+            CRUD::filter('added_by')
+                ->type('select2_ajax')
+                ->label(trans('expensed::base.added_by'))
+                ->placeholder(trans('expensed::base.added_by'))
+                ->values(backpack_url('money/ajax/users'))
+                ->whenActive(function ($value) {
+                    $this->crud->addClause('where', 'added_by_id', $value);
+                })->apply();
+        }
     }
 
 }

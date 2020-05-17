@@ -29,17 +29,40 @@ class IncomeCrudController extends CrudController
 
         $this->setupFilters();
 
+        if(checkPermission()) {
+            $this->crud->denyAccess(['list','create','show','update','delete']);
+
+            if(backpack_user()->hasPermissionTo('view_income')) {
+                $this->crud->allowAccess(['list', 'show']);
+            }
+
+            if(backpack_user()->hasPermissionTo('create_income')) {
+                $this->crud->allowAccess(['create']);
+            }
+
+            if(backpack_user()->hasPermissionTo('edit_income')) {
+                $this->crud->allowAccess(['update']);
+            }
+
+            if(backpack_user()->hasPermissionTo('delete_income')) {
+                $this->crud->allowAccess(['delete']);
+            }
+
+        }
+
         if(config('backpack.expensed.private_income')) {
             $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
         } else {
-            CRUD::filter('added_by')
-                ->type('select2_ajax')
-                ->label(trans('expensed::base.added_by'))
-                ->placeholder(trans('expensed::base.added_by'))
-                ->values(backpack_url('money/ajax/users'))
-                ->whenActive(function($value) {
-                    $this->crud->addClause('where', 'added_by_id', $value);
-                })->apply();
+            if(!checkPermission() OR backpack_user()->hasPermissionTo(config('backpack.expensed.permissions.users.view_users'))) {
+                CRUD::filter('added_by')
+                    ->type('select2_ajax')
+                    ->label(trans('expensed::base.added_by'))
+                    ->placeholder(trans('expensed::base.added_by'))
+                    ->values(backpack_url('money/ajax/users'))
+                    ->whenActive(function ($value) {
+                        $this->crud->addClause('where', 'added_by_id', $value);
+                    })->apply();
+            }
         }
     }
 

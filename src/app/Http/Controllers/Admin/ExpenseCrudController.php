@@ -27,20 +27,42 @@ class ExpenseCrudController extends CrudController
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/expenses');
         $this->crud->setEntityNameStrings(trans('expensed::base.expense'), trans('expensed::base.expenses'));
 
+        if(checkPermission()) {
+            $this->crud->denyAccess(['list','create','show','update','delete']);
+
+            if(backpack_user()->hasPermissionTo('view_expense')) {
+                $this->crud->allowAccess(['list', 'show']);
+            }
+
+            if(backpack_user()->hasPermissionTo('create_expense')) {
+                $this->crud->allowAccess(['create']);
+            }
+
+            if(backpack_user()->hasPermissionTo('edit_expense')) {
+                $this->crud->allowAccess(['update']);
+            }
+
+            if(backpack_user()->hasPermissionTo('delete_expense')) {
+                $this->crud->allowAccess(['delete']);
+            }
+        }
+
         $this->setupFilters();
 
-        if(config('backpack.expensed.private_expense')) {
+        if (config('backpack.expensed.private_expense')) {
             $this->crud->addClause('where', 'added_by_id', backpack_user()->id);
         } else {
-            CRUD::filter('added_by')
-                ->type('select2_ajax')
-                ->label(trans('expensed::base.added_by'))
-                ->placeholder(trans('expensed::base.added_by'))
-                ->values(backpack_url('money/ajax/users'))
-                ->whenActive(function($value) {
-                    $this->crud->addClause('where', 'added_by_id', $value);
-                })->apply();
-        }
+            if(!checkPermission() OR backpack_user()->hasPermissionTo(config('backpack.expensed.permissions.users.view_users'))) {
+                CRUD::filter('added_by')
+                    ->type('select2_ajax')
+                    ->label(trans('expensed::base.added_by'))
+                    ->placeholder(trans('expensed::base.added_by'))
+                    ->values(backpack_url('money/ajax/users'))
+                    ->whenActive(function ($value) {
+                        $this->crud->addClause('where', 'added_by_id', $value);
+                    })->apply();
+                }
+            }
     }
 
     protected function setupListOperation()

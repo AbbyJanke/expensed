@@ -22,4 +22,38 @@ return [
      */
     'api_token' => env('CURRENCY_API_TOKEN', null),
 
+    /**
+     * Permission Names to be used when verifying access.
+     */
+    'permissions' => [
+        'income' => [
+            'view' => 'view_income',
+            'add' => 'add_income',
+            'edit' => 'edit_income',
+            'delete' => 'delete_income',
+        ],
+        'expense' => [
+            'view' => 'view_expense',
+            'add' => 'add_expense',
+            'edit' => 'edit_expense',
+            'delete' => 'delete_expense',
+        ],
+        'categories' => [
+            'view' => 'view_categories',
+            'add' => 'add_categories',
+            'edit' => 'edit_categories',
+            'delete' => 'delete_categories',
+        ],
+        'reports' => [
+            'view' => 'view_reports',
+        ],
+        'currency' => [
+            'view' => 'view_currencies',
+            'refresh' => 'refresh_currencies',
+        ],
+        'users' => [
+            'view' => 'view_users',
+        ],
+    ],
+
 ];

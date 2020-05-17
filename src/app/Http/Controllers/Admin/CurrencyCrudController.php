@@ -26,8 +26,17 @@ class CurrencyCrudController extends CrudController
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/money/currencies');
         $this->crud->setEntityNameStrings(trans('expensed::base.currency'), trans('expensed::base.currencies'));
 
-        $this->crud->denyAccess('create');
-        $this->crud->addButton('top', 'update_rates', 'view', 'expensed::buttons.update_rates', 'beginning');
+        if(checkPermission()) {
+            $this->crud->denyAccess(['list', 'show', 'create', 'update', 'delete']);
+            if(backpack_user()->hasPermissionTo(config('backpack.expensed.permissions.currency.view'))) {
+                $this->crud->allowAccess(['list', 'show']);
+            }
+        }
+
+        if(!checkPermission() OR backpack_user()->hasPermissionTo(config('backpack.expensed.permissions.currency.refresh'))) {
+            $this->crud->allowAccess('update');
+            $this->crud->addButton('top', 'update_rates', 'view', 'expensed::buttons.update_rates', 'beginning');
+        }
 
         if (!$this->crud->getRequest()->has('order')) {
             $this->crud->orderBy('id');
@@ -58,12 +67,12 @@ class CurrencyCrudController extends CrudController
      */
     public function updateRates()
     {
-        $cmd = 'php '.base_path().'/artisan currency:update';
-        $export = shell_exec($cmd);
+        $cmd = base_path().'php artisan currency:update';
+        shell_exec($cmd);
 
         Alert::info(trans('expensed::base.rates_processing'))->flash();
 
-        return redirect(backpack_url('currency'));
+        return redirect(backpack_url('money/currencies'));
     }
 
     /**
